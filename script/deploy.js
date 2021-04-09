@@ -50,7 +50,7 @@ async function main() {
 
   // initial deployment
   for (const step of REPLAY) {
-    process.stdout.write(`Executing ${step.name} ...`);
+    process.stdout.write(`Deploying ${step.name} ... `);
     if (step.tx.nonce) {
       await signerFastForward(signers[step.from], step.tx.nonce);
     }

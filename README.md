@@ -41,4 +41,4 @@ This attribution process itself would not be decentralized, but once given back 
 Warning / disclaimer
 ---
 
-This script only replays the nonces 33, 36, 38, 39, 40 and 58 of this particular wallet. Dummy transactions are incerted between them. Before doing this on a live network, one should make sure that none of this is critical and would ever have to be replayed.
+This script only replays contract creating transaction by `0x46cf7ddb8bc751f666f691a4f96aa45e88d55d11`. Dummy transactions are inserted between them. After this deployment phase, this current scripts adds a manager (which also consumes a nonce). Before doing this on a live network, one should make sure that the other transaction (configuration) are not critical and would ever have to be replayed. If in doubt, don't do anything on a live network and raise an issue! 

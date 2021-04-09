@@ -20,14 +20,17 @@ module.exports = {
   },
   networks: {
     hardhat: {
-      mining: {
-        auto: false,
-        interval: [300, 600],
-      },
-    },
-    mainnet: {
-      url: process.env.JSONRPC,
-      accounts: [],
+      // mining: {
+      //   auto: false,
+      //   interval: [300, 600],
+      // },
     },
   },
 };
+
+if (process.env.JSONRPC) {
+  module.exports.network.mainnet = {
+    url: process.env.JSONRPC,
+    accounts: [],
+  };
+}

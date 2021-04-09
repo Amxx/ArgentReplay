@@ -1,27 +1,24 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
 
-const REPLAY = require('./replay.json');
+const REGISTRY = require('./registry');
+
 
 async function main() {
   const accounts = await ethers.getSigners();
 
-  // Metadata
-  const NameToAddress = REPLAY.reduce((acc, step) => ({
-    ...acc, [step.name]: ethers.utils.getAddress(step.address), [ethers.utils.getAddress(step.address)]: step.name
-  }), {});
-
   // Deploy wallets
   const walletfactory = new ethers.Contract(
-    NameToAddress['WalletFactory'],
-    [ 'function createWallet(address,address[],string) public' ],
+    REGISTRY['WalletFactory'],
+    ['function createWallet(address,address[],string)'],
     accounts[0],
   );
 
   const txs = await Promise.all(Array(100).fill().map(_ => walletfactory.createWallet(
     accounts[0].address,
-    [ NameToAddress['ModuleManager'] ],
-    ''
+    [REGISTRY['ModuleManager']],
+    '',
+    { gasLimit: 201316 },
   )));
 
   const receipts = await Promise.all(txs.map(tx => tx.wait()));

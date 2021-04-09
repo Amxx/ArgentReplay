@@ -20,7 +20,7 @@ async function main() {
   const txs = await Promise.all(Object.values(contracts).map(txhash => ethers.provider.getTransaction(txhash)));
   const summary = txs.reduce((acc, tx) => ({ ...acc, [tx.creates]: {
     from:  tx.from,
-    value: tx.value.toNumber(),
+    value: tx.value.toHexString(),
     data:  tx.data,
     nonce: tx.nonce,
   }}), {});

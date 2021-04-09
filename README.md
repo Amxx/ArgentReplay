@@ -41,4 +41,5 @@ This attribution process itself would not be decentralized, but once given back 
 Warning / disclaimer
 ---
 
-This script only replays contract creating transaction by `0x46cf7ddb8bc751f666f691a4f96aa45e88d55d11`. Dummy transactions are inserted between them. After this deployment phase, this current scripts adds a manager (which also consumes a nonce). Before doing this on a live network, one should make sure that the other transaction (configuration) are not critical and would ever have to be replayed. If in doubt, don't do anything on a live network and raise an issue! 
+This script replays the 66 first transaction by `0x46cf7ddb8bc751f666f691a4f96aa45e88d55d11`. This should be enough to setup a minimal platform. Some of these are to contract that might not exist on other chains (ENS related). They should probably me replace or deleted (in which case a dummy transaction will be inserted to ensure nonce are synched).
+In addition, the multisig at `0xa5c603e1c27a96171487aea0649b01c56248d2e8` is replaced by an EOA to simplify operations. Activity of this multisig should be analysed and replayed using the EOA. If in doubt, don't do anything on a live network and raise an issue! 

@@ -2,7 +2,7 @@ const hre = require('hardhat');
 const ethers = hre.ethers;
 
 
-const DEPLOYED = require('../data/all-0x46cf7ddb8bc751f666f691a4f96aa45e88d55d11.json');
+const DEPLOYED = require('../data/deployed-0x46cf7ddb8bc751f666f691a4f96aa45e88d55d11.json');
 const REGISTRY = require('./registry');
 
 
@@ -29,7 +29,7 @@ async function signerFastForward(signer, to) {
 }
 
 async function main() {
-  const [ admin ] = await ethers.getSigners();
+  const accounts = await ethers.getSigners();
 
   const signers = await Object.values(DEPLOYED)
     .map(({ from }) => from)
@@ -44,51 +44,60 @@ async function main() {
       };
     }, Promise.resolve({}));
 
-  await Promise.all((
-    await Promise.all(Object.values(signers).map(({ address }) => admin.sendTransaction({ to: address, value: ethers.utils.parseEther('1.0') })))
-  ).map(tx => tx.wait()));
+  {
+    const txs = await Promise.all(Object.values(signers).map(({ address }) => accounts[0].sendTransaction({ to: address, value: ethers.utils.parseEther('1.0') })));
+    const receipts = await Promise.all(txs.map(tx => tx.wait()));
+  }
 
   // ##########################################################################
   // #                              LETS DANCE !                              #
   // ##########################################################################
 
-  // First 66 txs (this is enough for now)
-  txs = DEPLOYED.slice(0, 66);
-  // this is a duplicate one, so we can use that to inject one more manager
-  txs[45].data = txs[45].data.slice(0, -40) + admin.address.toLowerCase().slice(2)
+  // initial deployment
+  for (const [ address, tx ] of Object.entries(DEPLOYED)) {
+    const name = REGISTRY[address] ?? ethers.utils.getAddress(address);
 
-  // might want to remove some of these
-  // txs[somenumber] = undefined
+    // beyound that, we need more initialisation
+    if (tx.nonce == 94) break;
 
-  // Replay deployment
-  for (const tx of txs) {
-    // skip deleted txs
-    if (!tx) continue;
-
-    // replace the multisig with out admin
-    tx.data = tx.data.replace('a5c603e1c27a96171487aea0649b01c56248d2e8', admin.address.slice(2).toLowerCase());
-
-    // replay tx
-    process.stdout.write(`Replaying tx ${tx.from}:${tx.nonce} ... `);
+    process.stdout.write(`Deploying ${name} ... `);
     if (tx.nonce) {
       await signerFastForward(signers[tx.from], tx.nonce);
     }
     const txpromise = await signers[tx.from].sendTransaction(tx);
     const receipt   = await txpromise.wait();
+    if (tx.address && receipt.contractAddress !== ethers.utils.getAddress(tx.address)) {
+      throw new Error('Error during deployment');
+    }
     process.stdout.write(`success\n`);
   }
 
   // Module registration
   const moduleregistry = new ethers.Contract(
     REGISTRY['ModuleRegistry'],
-    ['function registerModule(address,bytes32) public'],
-    admin,
+    [ 'function registerModule(address,bytes32) public' ],
+    signers['0x46cf7ddb8bc751F666f691a4F96Aa45E88D55D11'],
   );
 
-  // only one module for now
-  for (const module of ['ModuleManager']) {
+  for (const module of [
+    'ModuleManager',
+    // 'ApprovedTransfer',
+    // 'DappManager',
+    // 'GuardianManager',
+    // 'LockManager',
+    // 'RecoveryManager',
+    // 'TokenTransfer',
+    // 'TokenExchanger',
+  ])
+  {
     await moduleregistry.registerModule(REGISTRY[module], ethers.constants.HashZero);
   }
+
+  // Set as manager
+  await signers['0x46cf7ddb8bc751F666f691a4F96Aa45E88D55D11'].sendTransaction({
+    to: '0x851cc731ce1613ae4fd8ec7f61f4b350f9ce1020',
+    data: '0x2d06177a000000000000000000000000' + accounts[0].address.slice(2),
+  });
 }
 
 main()

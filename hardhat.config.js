@@ -29,7 +29,7 @@ module.exports = {
 };
 
 if (process.env.JSONRPC) {
-  module.exports.network.mainnet = {
+  module.exports.networks.mainnet = {
     url: process.env.JSONRPC,
     accounts: [],
   };

@@ -25,5 +25,9 @@ module.exports = {
         interval: [300, 600],
       },
     },
+    mainnet: {
+      url: process.env.JSONRPC,
+      accounts: [],
+    },
   },
 };

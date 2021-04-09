@@ -19,12 +19,13 @@ async function main() {
   const contracts = receipt.filter(({ contractAddress }) => contractAddress).reduce((acc, { contractAddress, txhash }) => ({ ...acc, [contractAddress]: txhash }), {});
   const txs = await Promise.all(Object.values(contracts).map(txhash => ethers.provider.getTransaction(txhash)));
   const summary = txs.reduce((acc, tx) => ({ ...acc, [tx.creates]: {
+    from:  tx.from,
     value: tx.value.toNumber(),
     data:  tx.data,
     nonce: tx.nonce,
   }}), {});
-  
-  console.log(summary)
+
+  console.log(JSON.stringify(summary));
 }
 
 main()

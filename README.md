@@ -37,3 +37,8 @@ How it that usefull ?
 If argent was to use the private key associated with `0x46cf7ddb8bc751f666f691a4f96aa45e88d55d11` to do this deployment on xDAI, and would then create batch of wallets with one of their key as the owner, they would have a pool of wallets that they could reconfigure (enable more modules + transfer ownership) to their legitimate owner.
 
 This attribution process itself would not be decentralized, but once given back to the users, the wallets would have the same security model as they have on mainnet.
+
+Warning / disclaimer
+---
+
+This script only replays the nonces 33, 36, 38, 39, 40 and 58 of this particular wallet. Dummy transactions are incerted between them. Before doing this on a live network, one should make sure that none of this is critical and would ever have to be replayed.
